@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 )
 
 // writeYAML writes a map as simple YAML to the given writer.
@@ -13,10 +14,7 @@ func writeYAML(w io.Writer, data map[string]interface{}) error {
 }
 
 func writeYAMLIndented(w io.Writer, data map[string]interface{}, depth int) error {
-	indent := ""
-	for i := 0; i < depth; i++ {
-		indent += "  "
-	}
+	indent := strings.Repeat("  ", depth)
 
 	keys := make([]string, 0, len(data))
 	for k := range data {
