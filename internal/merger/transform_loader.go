@@ -27,7 +27,13 @@ func LoadTransforms(path string) (*Transformer, error) {
 		return nil, fmt.Errorf("parsing transform file: %w", err)
 	}
 	rules := make([]TransformRule, 0, len(specs))
-	for _, spec := range specs {
+	for i, spec := range specs {
+		if spec.Path == "" {
+			return nil, fmt.Errorf("rule at index %d is missing required field \"path\"", i)
+		}
+		if spec.Operation == "" {
+			return nil, fmt.Errorf("rule at index %d (path %q) is missing required field \"op\"", i, spec.Path)
+		}
 		rule, err := buildTransformRule(spec)
 		if err != nil {
 			return nil, fmt.Errorf("building rule for path %q: %w", spec.Path, err)
