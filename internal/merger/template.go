@@ -51,6 +51,11 @@ func (te *TemplateExpander) expandValue(v interface{}) (interface{}, error) {
 }
 
 func (te *TemplateExpander) renderTemplate(s string) (string, error) {
+	// Skip template parsing for strings that contain no template actions,
+	// avoiding unnecessary allocations for the common case.
+	if !containsTemplateAction(s) {
+		return s, nil
+	}
 	tmpl, err := template.New("").Option("missingkey=error").Parse(s)
 	if err != nil {
 		return "", fmt.Errorf("parse template %q: %w", s, err)
@@ -60,4 +65,15 @@ func (te *TemplateExpander) renderTemplate(s string) (string, error) {
 		return "", fmt.Errorf("execute template %q: %w", s, err)
 	}
 	return buf.String(), nil
+}
+
+// containsTemplateAction reports whether s contains at least one template
+// action delimiter ("{{" ... "}}"), used as a fast pre-check before parsing.
+func containsTemplateAction(s string) bool {
+	for i := 0; i < len(s)-1; i++ {
+		if s[i] == '{' && s[i+1] == '{' {
+			return true
+		}
+	}
+	return false
 }
