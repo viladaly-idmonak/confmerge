@@ -99,3 +99,21 @@ func TestParseSchemaType_Defaults(t *testing.T) {
 		t.Errorf("expected TypeAny for empty type, got %v", got)
 	}
 }
+
+func TestParseSchemaType_KnownTypes(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected SchemaType
+	}{
+		{"string", TypeString},
+		{"int", TypeInt},
+		{"bool", TypeBool},
+		{"map", TypeMap},
+		{"list", TypeList},
+	}
+	for _, tt := range tests {
+		if got := parseSchemaType(tt.input); got != tt.expected {
+			t.Errorf("parseSchemaType(%q): expected %v, got %v", tt.input, tt.expected, got)
+		}
+	}
+}
