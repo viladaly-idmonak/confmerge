@@ -18,7 +18,7 @@ func TestTemplateExpander_NoTemplates(t *testing.T) {
 
 func TestTemplateExpander_SimpleVar(t *testing.T) {
 	te := NewTemplateExpander(map[string]interface{}{"Env": "production"})
-	input := map[string]interface{}{"name": "app-{{.Env}}"}
+	input := map[string]interface{}{"name": "app-{{.Env}}"})
 	out, err := te.Expand(input)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -81,5 +81,17 @@ func TestTemplateExpander_InvalidTemplate(t *testing.T) {
 	_, err := te.Expand(input)
 	if err == nil {
 		t.Fatal("expected parse error, got nil")
+	}
+}
+
+func TestTemplateExpander_MultipleVars(t *testing.T) {
+	te := NewTemplateExpander(map[string]interface{}{"Env": "prod", "Region": "us-west-2"})
+	input := map[string]interface{}{"label": "{{.Env}}-{{.Region}}"}
+	out, err := te.Expand(input)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if out["label"] != "prod-us-west-2" {
+		t.Errorf("expected prod-us-west-2, got %v", out["label"])
 	}
 }
